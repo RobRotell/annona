@@ -1,0 +1,23 @@
+@font-face {
+	font-display: swap;
+	font-family: 'Gloria';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Gloria'), url('@/fonts/gloria-hallelujah-400.woff2') format('woff2');
+}
+
+@font-face {
+	font-display: swap;
+	font-family: 'Source Sans';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Source Sans'), url('@/fonts/source-sans-400.woff2') format('woff2');
+}
+
+@font-face {
+	font-display: swap;
+	font-family: 'Source Sans';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Source Sans'), url('@/fonts/source-sans-700.woff2') format('woff2');
+}

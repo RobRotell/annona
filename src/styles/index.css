@@ -1,0 +1,18 @@
+@import 'modern-normalize/modern-normalize.css';
+
+@import './variables';
+@import './fonts';
+
+html,
+body {
+	position: relative;
+	min-height: 100vh;
+}
+
+body {
+	font-family: var(--fontSourceSans);
+	font-weight: 400;
+	font-size: var(--fontBaseSize);
+	color: var(--colorBlack);
+	background-color: var(--colorYellow);
+}
