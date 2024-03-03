@@ -15,11 +15,13 @@
 	"type": "module",
 	"main": "index.js",
 	"scripts": {
-		"dev": "vite",
+		"dev": "vite --port 6561",
 		"build": "vite build",
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@emotion/css": "^11.11.2",
+		"@emotion/styled": "^11.11.0",
 		"modern-normalize": "^2.0.0",
 		"preact": "^10.19.6"
 	},
