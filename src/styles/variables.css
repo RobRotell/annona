@@ -4,9 +4,12 @@
 	--fontBaseSize: 16px;
 	--colorYellow: #FFFF99;
 	--colorRed: #E8567D;
+	--colorGreen: #56E869;
 	--colorBlue: #1E8FA2;
 	--colorBlack: #1F1F1F;
 	--colorWhite: #F6F6F6;
 	--colorSuccess: #4E7E54;
 	--colorError: #7A2D41;
+	--transitionSpeed: 0.175s;
+	--gutterOffset: 65;
 }
