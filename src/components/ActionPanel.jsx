@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { Icon } from './Icon.jsx'
+import { css } from '@emotion/css'
 
 
 const Panel = styled.div`
@@ -11,7 +12,7 @@ const Panel = styled.div`
 	width: 100%;
 	background-color: var( --colorBlack );
 	padding: 20px 30px;
-	z-index: 2000;
+	z-index: 5000;
 `
 
 const ActionBtn = styled.button`
@@ -30,20 +31,24 @@ const ActionBtn = styled.button`
 		fill: var( --colorWhite );
 		transition: fill var( --transitionSpeed ) linear;
 	}
-
-	&:hover path {
-		fill: var( --colorGreen );
-	}
 `
 
 
 export const ActionPanel = () => {
 	return (
 		<Panel>
-			<ActionBtn>
-				<Icon name="account" />
+			<ActionBtn className={css`
+				&:hover path {
+					fill: var( --colorGreen );
+				}
+			`}>
+				<Icon name="account" css />
 			</ActionBtn>
-			<ActionBtn>
+			<ActionBtn className={css`
+				&:hover path {
+					fill: var( --colorRed );
+				}
+			`}>
 				<Icon name="trash" />
 			</ActionBtn>
 		</Panel>

@@ -1,8 +1,7 @@
-
-
 import styled from '@emotion/styled'
 import { ActionPanel } from './ActionPanel.jsx'
 import { GroceryList } from './GroceryList.jsx'
+import { AuthScreen } from './AuthScreen.jsx'
 
 
 const GroceryListContainer = styled.div`
@@ -40,6 +39,7 @@ export const App = () => {
 				<GroceryList />
 			</GroceryListContainer>
 			<ActionPanel />
+			<AuthScreen />
 		</>
 	)
 }
