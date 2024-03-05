@@ -22,15 +22,10 @@
 	"dependencies": {
 		"@emotion/css": "^11.11.2",
 		"@emotion/styled": "^11.11.0",
+		"idb-keyval": "^6.2.1",
 		"modern-normalize": "^2.0.0",
 		"preact": "^10.19.6"
 	},
-	"eslintConfig": {
-		"extends": "preact"
-	},
-	"browserslist": [
-		"defaults, not dead"
-	],
 	"devDependencies": {
 		"@preact/preset-vite": "^2.8.1",
 		"browserslist-to-esbuild": "^2.1.1",
@@ -44,5 +39,11 @@
 		"vite": "^5.1.4",
 		"vite-plugin-minify": "^1.5.2",
 		"vite-plugin-radar": "^0.9.3"
-	}
+	},
+	"eslintConfig": {
+		"extends": "preact"
+	},
+	"browserslist": [
+		"defaults, not dead"
+	]
 }
