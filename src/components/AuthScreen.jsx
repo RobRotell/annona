@@ -1,4 +1,8 @@
 import styled from '@emotion/styled'
+import { createRef } from 'preact'
+import { Creds } from '../controllers/Creds.js'
+import { useContext, useEffect, useState } from 'preact/hooks'
+import { AppContext } from './App.jsx'
 
 
 const Container = styled.div( props => ({
@@ -11,7 +15,7 @@ const Container = styled.div( props => ({
 	placeItems: 'center',
 	padding: '36px 24px 86px',
 	transform: props.isExpanded ? 'translateY( 0 )' : 'translateY( 100% )',
-	transition: 'background-color var( --transitionSpeed ) linear',
+	transition: 'transform var( --transitionSpeed ) linear',
 	backgroundColor: 'var( --colorWhite )',
 	zIndex: 4000,
 }) )
@@ -92,24 +96,75 @@ const BtnSubmit = styled.button`
 
 
 export const AuthScreen = props => {
+	const {
+		authIsVisible,
+		setAuthIsVisible,
+		setMessageData
+	} = useContext( AppContext )
 
-	props.isExpanded = true
+	const [ usernameInput, setUsernameInput ] = useState( '' )
+	const [ passwordInput, setPasswordInput ] = useState( '' )
 
+	useEffect( () => {
+		Creds.getCreds()
+			.then( creds => {
+				if( creds ) {
+					const { username, password } = creds
+
+					if( username ) {
+						setUsernameInput( username )
+					}
+
+					if( password ) {
+						setPasswordInput( password )
+					}
+				}
+			})
+	}, [] )
+
+
+	const refUsername = createRef()
+	const refPassword = createRef()
+
+	const handleFormSubmit = e => {
+		e.preventDefault()
+
+		const username = refUsername.current.value
+		const password = refPassword.current.value
+
+		Creds.setCreds( username, password)
+			.then( () => {
+				setMessageData({
+					message: 'Success!',
+					isError: false,
+				})
+
+				// hide auth screen once done
+				setAuthIsVisible( false )
+
+			}).catch( err => {
+				setMessageData({
+					message: err,
+					isError: true,
+				})
+			})
+	}
 
 	return (
-		<Container isExpanded={props.isExpanded}>
+		<Container isExpanded={authIsVisible}>
 			<Panel>
 				<Headline>
 					Enter your credentials below:
 				</Headline>
 
-				<Form>
+				<Form onSubmit={handleFormSubmit}>
 					<LabelGroup for="auth_username">
 						<RealLabel>Username</RealLabel>
 						<Input
 							id="auth_username"
 							type="text"
-							value="bob"
+							value={usernameInput}
+							ref={refUsername}
 						/>
 					</LabelGroup>
 
@@ -118,12 +173,13 @@ export const AuthScreen = props => {
 						<Input
 							id="auth_password"
 							type="password"
-							value="bob"
+							value={passwordInput}
+							ref={refPassword}
 						/>
 					</LabelGroup>
 
 					<BtnSubmit
-						type="button"
+						type="submit"
 					>Save</BtnSubmit>
 				</Form>
 			</Panel>

@@ -1,6 +1,8 @@
 import styled from '@emotion/styled'
 import { Icon } from './Icon.jsx'
 import { css } from '@emotion/css'
+import { useContext } from 'preact/hooks'
+import { AppContext } from './App.jsx'
 
 
 const Panel = styled.div`
@@ -12,7 +14,7 @@ const Panel = styled.div`
 	width: 100%;
 	background-color: var( --colorBlack );
 	padding: 20px 30px;
-	z-index: 5000;
+	z-index: 10000;
 `
 
 const ActionBtn = styled.button`
@@ -35,20 +37,31 @@ const ActionBtn = styled.button`
 
 
 export const ActionPanel = () => {
+	const { authIsVisible, setAuthIsVisible } = useContext( AppContext )
+
+
+	const handleShowAccount = () => setAuthIsVisible( !authIsVisible )
+
+
 	return (
 		<Panel>
-			<ActionBtn className={css`
-				&:hover path {
-					fill: var( --colorGreen );
-				}
-			`}>
+			<ActionBtn
+				onClick={handleShowAccount}
+				className={css`
+					&:hover path {
+						fill: var( --colorGreen );
+					}
+				`}
+			>
 				<Icon name="account" css />
 			</ActionBtn>
-			<ActionBtn className={css`
-				&:hover path {
-					fill: var( --colorRed );
-				}
-			`}>
+			<ActionBtn
+				className={css`
+					&:hover path {
+						fill: var( --colorRed );
+					}
+				`}
+			>
 				<Icon name="trash" />
 			</ActionBtn>
 		</Panel>

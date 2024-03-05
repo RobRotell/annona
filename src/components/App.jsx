@@ -2,6 +2,9 @@ import styled from '@emotion/styled'
 import { ActionPanel } from './ActionPanel.jsx'
 import { GroceryList } from './GroceryList.jsx'
 import { AuthScreen } from './AuthScreen.jsx'
+import { createContext } from 'preact'
+import { useState } from 'preact/hooks'
+import { MessageBanner } from './MessageBanner.jsx'
 
 
 const GroceryListContainer = styled.div`
@@ -32,14 +35,36 @@ const GroceryListContainer = styled.div`
 `
 
 
+export const AppContext = createContext( null )
+
+
 export const App = () => {
+
+	const [ messageData, setMessageData ] = useState({
+		message: '',
+		isError: false,
+	})
+
+	const [ authIsVisible, setAuthIsVisible ] = useState( false )
+
+
+	const providerData = {
+		messageData,
+		setMessageData,
+		authIsVisible,
+		setAuthIsVisible,
+	}
+
 	return (
-		<>
+		<AppContext.Provider value={providerData}>
 			<GroceryListContainer>
 				<GroceryList />
 			</GroceryListContainer>
-			<ActionPanel />
-			<AuthScreen />
-		</>
+			<>
+				<ActionPanel />
+				<AuthScreen />
+				<MessageBanner />
+			</>
+		</AppContext.Provider>
 	)
 }
