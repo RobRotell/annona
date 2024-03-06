@@ -97,64 +97,72 @@ const BtnSubmit = styled.button`
 
 export const MyAccountPanel = props => {
 	const {
-		authIsVisible,
-		setAuthIsVisible,
-		setMessageData
+		myAccountIsVisible,
+		setMyAccountIsVisible,
+		setMessageData,
+		setHasSignedIn,
 	} = useContext( AppContext )
 
 	const [ usernameInput, setUsernameInput ] = useState( '' )
 	const [ passwordInput, setPasswordInput ] = useState( '' )
 
+	// pull creds from IndexedDB (if they exist)
 	useEffect( () => {
 		Creds.getCreds()
 			.then( creds => {
+				// todo -- check if creds are valid?
 				if( creds ) {
 					const { username, password } = creds
 
-					if( username ) {
+					if( username && username.length && password && password.length ) {
 						setUsernameInput( username )
-					}
-
-					if( password ) {
 						setPasswordInput( password )
+
+						setHasSignedIn( true )
 					}
 				}
 			})
 	}, [] )
 
-
 	const refUsername = createRef()
 	const refPassword = createRef()
 
-	const handleFormSubmit = e => {
+	const handleFormSubmit = async e => {
 		e.preventDefault()
 
 		const username = refUsername.current.value
 		const password = refPassword.current.value
 
-		Creds.setCreds( username, password)
-			.then( () => {
-				setMessageData({
-					message: 'Success!',
-					isError: false,
-				})
+		const isValid = await Creds.validateCreds( username, password )
 
-				// hide auth screen once done
-				setAuthIsVisible( false )
-
-			}).catch( err => {
-				setMessageData({
-					message: err,
-					isError: true,
-				})
+		if( !isValid ) {
+			setMessageData({
+				message: 'Login failed. Please try again!',
+				isError: true,
+				delay: 5000,
 			})
+		} else {
+			// todo -- catch potential errors with IndexDB
+			await Creds.setCreds( username, password )
+
+			setMessageData({
+				message: 'Success!'
+			})
+
+			// ensures persistent through re-rendering
+			setUsernameInput( username )
+			setPasswordInput( password )
+
+			setMyAccountIsVisible( false )
+			setHasSignedIn( true )
+		}
 	}
 
 	return (
-		<Container isExpanded={authIsVisible}>
+		<Container isExpanded={myAccountIsVisible}>
 			<Panel>
 				<Headline>
-					Enter your credentials below:
+					My Account
 				</Headline>
 
 				<Form onSubmit={handleFormSubmit}>

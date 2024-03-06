@@ -48,17 +48,19 @@ export const App = () => {
 	})
 
 	// used for "My Account" flyout panel
-	const [ authIsVisible, setAuthIsVisible ] = useState( false )
+	const [ myAccountIsVisible, setMyAccountIsVisible ] = useState( false )
 
 	// used for detecting when a user has signed in
-	const [ hasSignedIn, setHasSignedIn ] = useState( 0 )
+	const [ hasSignedIn, setHasSignedIn ] = useState( false )
 
 
 	const providerData = {
 		messageData,
 		setMessageData,
-		authIsVisible,
-		setAuthIsVisible,
+		myAccountIsVisible,
+		setMyAccountIsVisible,
+		hasSignedIn,
+		setHasSignedIn,
 	}
 
 	return (

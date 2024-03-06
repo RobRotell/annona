@@ -37,11 +37,9 @@ const ActionBtn = styled.button`
 
 
 export const ActionsBar = () => {
-	const { authIsVisible, setAuthIsVisible } = useContext( AppContext )
+	const { myAccountIsVisible, setMyAccountIsVisible } = useContext( AppContext )
 
-
-	const handleShowAccount = () => setAuthIsVisible( !authIsVisible )
-
+	const handleShowAccount = () => setMyAccountIsVisible( !myAccountIsVisible )
 
 	return (
 		<Bar>
@@ -49,20 +47,26 @@ export const ActionsBar = () => {
 				onClick={handleShowAccount}
 				className={css`
 					&:hover path {
-						fill: var( --colorGreen );
+						--fillColor: var( --colorGreen ) !important;
 					}
 				`}
 			>
-				<Icon name="account" css />
+				<Icon
+					name="account"
+					color="var( --colorWhite )"
+				/>
 			</ActionBtn>
 			<ActionBtn
 				className={css`
 					&:hover path {
-						fill: var( --colorRed );
+						fill: var( --colorRed ) !important;
 					}
 				`}
 			>
-				<Icon name="trash" />
+				<Icon
+					name="trash"
+					color="var( --colorWhite )"
+				/>
 			</ActionBtn>
 		</Bar>
 	)

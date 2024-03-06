@@ -1,8 +1,9 @@
 import styled from '@emotion/styled'
 import { GroceryListItem } from './GroceryListItem.jsx'
 import { createContext } from 'preact'
-import { useEffect, useState } from 'preact/hooks'
+import { useContext, useEffect, useState } from 'preact/hooks'
 import { Grocer } from '../controllers/Grocer.js'
+import { AppContext } from './App.jsx'
 
 
 const List = styled.div`
@@ -18,18 +19,23 @@ export const ListContext = createContext( null )
 
 
 export const GroceryList = () => {
+	const { hasSignedIn, setHasSignedIn } = useContext( AppContext )
 
 	const [ listItems, setListItems ] = useState( [] )
 
+	// populate list items when user is auto-signed (on page load) or signs in manually
 	useEffect( () => {
-		Grocer
-			.getItems()
-			.then( items => {
-				setListItems( items )
-			}).catch( err => {
-				console.log( err )
-			})
-	}, [] )
+		console.log( hasSignedIn )
+		if( hasSignedIn ) {
+			Grocer
+				.getItems()
+				.then( items => {
+					setListItems( items )
+				}).catch( err => {
+					console.log( err )
+				})
+		}
+	}, [ hasSignedIn ] )
 
 	const providerData = {
 		listItems,
