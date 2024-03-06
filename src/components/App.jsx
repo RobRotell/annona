@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
-import { ActionPanel } from './ActionPanel.jsx'
+import { ActionsBar } from './ActionsBar.jsx'
 import { GroceryList } from './GroceryList.jsx'
-import { AuthScreen } from './AuthScreen.jsx'
+import { MyAccountPanel } from './MyAccountPanel.jsx'
 import { createContext } from 'preact'
 import { useState } from 'preact/hooks'
 import { MessageBanner } from './MessageBanner.jsx'
@@ -40,12 +40,18 @@ export const AppContext = createContext( null )
 
 export const App = () => {
 
+	// used for message banner at bottom of screen
 	const [ messageData, setMessageData ] = useState({
 		message: '',
 		isError: false,
+		delay: 3000,
 	})
 
+	// used for "My Account" flyout panel
 	const [ authIsVisible, setAuthIsVisible ] = useState( false )
+
+	// used for detecting when a user has signed in
+	const [ hasSignedIn, setHasSignedIn ] = useState( 0 )
 
 
 	const providerData = {
@@ -61,8 +67,8 @@ export const App = () => {
 				<GroceryList />
 			</GroceryListContainer>
 			<>
-				<ActionPanel />
-				<AuthScreen />
+				<ActionsBar />
+				<MyAccountPanel />
 				<MessageBanner />
 			</>
 		</AppContext.Provider>

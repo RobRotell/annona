@@ -95,7 +95,7 @@ const BtnSubmit = styled.button`
 `
 
 
-export const AuthScreen = props => {
+export const MyAccountPanel = props => {
 	const {
 		authIsVisible,
 		setAuthIsVisible,

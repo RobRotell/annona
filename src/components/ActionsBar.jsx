@@ -5,7 +5,7 @@ import { useContext } from 'preact/hooks'
 import { AppContext } from './App.jsx'
 
 
-const Panel = styled.div`
+const Bar = styled.div`
 	position: sticky;
 	bottom: 0;
 	display: flex;
@@ -36,7 +36,7 @@ const ActionBtn = styled.button`
 `
 
 
-export const ActionPanel = () => {
+export const ActionsBar = () => {
 	const { authIsVisible, setAuthIsVisible } = useContext( AppContext )
 
 
@@ -44,7 +44,7 @@ export const ActionPanel = () => {
 
 
 	return (
-		<Panel>
+		<Bar>
 			<ActionBtn
 				onClick={handleShowAccount}
 				className={css`
@@ -64,6 +64,6 @@ export const ActionPanel = () => {
 			>
 				<Icon name="trash" />
 			</ActionBtn>
-		</Panel>
+		</Bar>
 	)
 }

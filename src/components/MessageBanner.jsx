@@ -23,11 +23,13 @@ const Banner = styled.div( props => ({
 
 
 export const MessageBanner = props => {
-	const { messageData: data, setMessageData } = useContext( AppContext )
+	const { messageData, setMessageData } = useContext( AppContext )
 	const [ isVisible, setIsVisible ] = useState( false )
 
+	const { message = '', delay = 3000, isError = false } = messageData
+
 	useEffect( () => {
-		if( '' === data.message ) {
+		if( '' === message ) {
 			setIsVisible( false )
 		} else {
 			setIsVisible( true )
@@ -40,16 +42,18 @@ export const MessageBanner = props => {
 				setTimeout( () => {
 					setMessageData({
 						message: '',
-						isError: false,
 					})
 				}, 1000 )
-			}, 2000 )
+			}, delay )
 		}
-	}, [ data.message ] )
+	}, [ message ] )
 
 	return (
-		<Banner isVisible={isVisible} isError={data.isError}>
-			{data.message}
+		<Banner
+			isVisible={isVisible}
+			isError={isError}
+		>
+			{message}
 		</Banner>
 	)
 }
