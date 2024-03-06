@@ -1,4 +1,5 @@
 import { get, set } from 'idb-keyval'
+import { API } from './API.js'
 
 
 export class Creds {
@@ -47,6 +48,29 @@ export class Creds {
 					console.warn( err )
 					return reject( 'Failed to save credentials!' )
 				})
+		})
+	}
+
+
+	/**
+	 * Validate creds again endpoint
+	 *
+	 * @todo catch errors
+	 *
+	 * @param {string} username
+	 * @param {string} password
+	 *
+	 * @return {Promise<boolean>} True, if valid
+	 */
+	static validateCreds( username, password ) {
+		return new Promise( resolve => {
+			API.sendRequest( 'user/verify', 'POST', false, {
+				username,
+				password
+			}).then( res => {
+				resolve( res.status && 'success' === res.status )
+			})
+			// todo -- catch
 		})
 	}
 

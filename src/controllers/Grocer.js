@@ -20,6 +20,7 @@ export class Grocer {
 
 		const req = await API.sendRequest(
 			'items/get',
+			'GET',
 			true,
 		)
 
