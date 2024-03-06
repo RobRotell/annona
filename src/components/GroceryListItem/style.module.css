@@ -1,0 +1,36 @@
+.row {
+	display: flex;
+}
+
+.checkbox {
+	display: flex;
+	place-content: center;
+	place-items: center;
+	width: 65px;
+	height: 100%;
+	cursor: pointer;
+	opacity: 0;
+	transition: var(--transitionSpeed) linear;
+	background: transparent;
+	border: none;
+	-webkit-appearance: none;
+
+	&:hover {
+		opacity: 1;
+	}
+}
+
+.listItem {
+	position: relative;
+	flex: 1;
+	width: calc(100vw - 95px);
+	height: 56px;
+	margin-left: 30px;
+	padding: 12px 20px 12px 0;
+	font-family: var(--fontGloria);
+	font-size: 28px;
+	letter-spacing: 0.05rem;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}

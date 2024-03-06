@@ -1,0 +1,45 @@
+.bar {
+	position: sticky;
+	bottom: 0;
+	display: flex;
+	place-items: center;
+	place-content: space-between;
+	width: 100%;
+	background-color: var(--colorBlack);
+	padding: 20px 30px;
+	z-index: 10000;
+
+	.button {
+		display: flex;
+		place-items: center;
+		place-content: center;
+		width: 46px;
+		height: 46px;
+		color: var(--colorWhite);
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		-webkit-appearance: none;
+
+		& path {
+			fill: var(--colorWhite);
+			transition: fill var(--transitionSpeed) linear;
+		}
+
+		&.buttonGreen {
+			&:hover {
+				path {
+					fill: var(--colorGreen) !important;
+				}
+			}
+		}
+
+		&.buttonRed {
+			&:hover {
+				path {
+					fill: var(--colorRed) !important;
+				}
+			}
+		}
+	}
+}

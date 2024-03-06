@@ -1,0 +1,28 @@
+.banner {
+	--yPosition: 100%;
+	--textColor: var(--colorBlack);
+	--backgroundColor: var(--colorGreen);
+	position: fixed;
+	inset: auto 0 86px 0;
+	display: block;
+	padding: 16px 32px;
+	font-weight: 700;
+	font-size: 24px;
+	text-align: center;
+	letter-spacing: 0.1rem;
+	color: var(--textColor);
+	text-transform: uppercase;
+	background-color: var(--backgroundColor);
+	transition: transform var(--transitionSpeed) linear;
+	transform: translateY(var(--yPosition));
+	z-index: 8000;
+
+	&.isVisible {
+		--yPosition: 0%;
+	}
+
+	&.isError {
+		--textColor: var(--colorWhite);
+		--backgroundColor: var(--colorRed);
+	}
+}

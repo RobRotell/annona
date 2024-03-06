@@ -1,16 +1,4 @@
-import styled from '@emotion/styled'
-
-
-const Container = styled.i`
-	display: flex;
-	place-content: center;
-	place-items: center;
-	text-decoration: none;
-
-	& path {
-		fill: var( --fillColor );
-	}
-`
+import style from './style.module.css'
 
 
 export const Icon = props => {
@@ -44,9 +32,9 @@ export const Icon = props => {
 
 	if( iconContent ) {
 		return (
-			<Container>
+			<div class={style.container}>
 				{iconContent}
-			</Container>
+			</div>
 		)
 	} else {
 		return (

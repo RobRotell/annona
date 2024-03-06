@@ -1,0 +1,10 @@
+.container {
+	display: flex;
+	place-content: center;
+	place-items: center;
+	text-decoration: none;
+
+	& path {
+		fill: var(--fillColor);
+	}
+}

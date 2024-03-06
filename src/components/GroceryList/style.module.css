@@ -1,0 +1,7 @@
+.list {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="56"><rect width="100%" height="2" fill="%231E8FA2"/></svg>');
+	background-repeat: repeat-y;
+}
