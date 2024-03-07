@@ -21,12 +21,14 @@ export const App = () => {
 		delay: 3000,
 	})
 
-	// used for "My Account" flyout panel
+	// used for expanding/collapsing "My Account" flyout panel
 	const [ myAccountIsVisible, setMyAccountIsVisible ] = useState( false )
 
 	// used for detecting when a user has signed in
 	const [ hasSignedIn, setHasSignedIn ] = useState( false )
 
+	// used for organizing grocery items
+	const [ listItems, setListItems ] = useState( [] )
 
 	const providerData = {
 		messageData,
@@ -35,6 +37,8 @@ export const App = () => {
 		setMyAccountIsVisible,
 		hasSignedIn,
 		setHasSignedIn,
+		listItems,
+		setListItems,
 	}
 
 	return (
