@@ -9,13 +9,12 @@ import { AppContext } from '../App'
 import { GroceryListItem } from '../GroceryListItem'
 
 
-export const ListContext = createContext( null )
-
-
 export const GroceryList = () => {
-	const { hasSignedIn, setHasSignedIn } = useContext( AppContext )
-
-	const [ listItems, setListItems ] = useState( [] )
+	const {
+		hasSignedIn,
+		listItems,
+		setListItems
+	} = useContext( AppContext )
 
 	// populate list items when user is auto-signed (on page load) or signs in manually
 	useEffect( () => {
@@ -23,6 +22,10 @@ export const GroceryList = () => {
 			Grocer
 				.getItems()
 				.then( items => {
+					items = items.map( item => {
+						item.isChecked = false
+						return item
+					})
 					setListItems( items )
 				}).catch( err => {
 					console.log( err )
@@ -30,22 +33,21 @@ export const GroceryList = () => {
 		}
 	}, [ hasSignedIn ] )
 
-	const providerData = {
-		listItems,
-		setListItems,
-	}
-
 
 	return (
-		<ListContext.Provider value={providerData}>
-			<div class={style.list}>
-				{listItems.map( item => (
-					<GroceryListItem
-						key={item.id}
-						name={item.name}
-					/>
-				) )}
-			</div>
-		</ListContext.Provider>
+		<div class={style.list}>
+			{listItems.map( ( item, i ) => (
+				<GroceryListItem
+					key={item.id}
+					id={item.id}
+					index={i}
+					value={item.name}
+					isChecked={item.isChecked}
+				/>
+			) )}
+			<GroceryListItem
+				isBlank={true}
+			/>
+		</div>
 	)
 }
