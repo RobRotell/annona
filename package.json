@@ -17,12 +17,15 @@
 	"scripts": {
 		"dev": "vite --port 6561",
 		"build": "vite build",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"generate-pwa-assets": "pwa-assets-generator --preset minimal-2023 src/images/favicon.svg"
 	},
 	"dependencies": {
+		"@vite-pwa/assets-generator": "^0.2.4",
 		"idb-keyval": "^6.2.1",
 		"modern-normalize": "^2.0.0",
-		"preact": "^10.19.6"
+		"preact": "^10.19.6",
+		"vite-plugin-pwa": "^0.19.2"
 	},
 	"devDependencies": {
 		"@preact/preset-vite": "^2.8.1",
