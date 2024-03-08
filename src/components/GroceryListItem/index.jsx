@@ -2,7 +2,7 @@ import { createRef } from 'preact'
 import { AppContext } from '../App/index.jsx'
 import style from './style.module.css'
 
-import { useContext, useEffect, useState } from 'preact/hooks'
+import { useContext, useState } from 'preact/hooks'
 import { Grocer } from '../../controllers/Grocer.js'
 
 
@@ -12,7 +12,6 @@ export const GroceryListItem = props => {
 	const {
 		listItems,
 		setListItems,
-		messageData,
 		setMessageData,
 	} = useContext( AppContext )
 
@@ -32,8 +31,22 @@ export const GroceryListItem = props => {
 		})
 	}
 
+	// check if tab or enter key was pressed
+	const handleOnKeyup = e => {
+		const targetKeys = [
+			9, // tab
+			13, // enter
+		]
+
+		if( targetKeys.includes( e.keyCode ) ) {
+			addOrUpdateItem()
+		}
+	}
+
 	// add or update item when user leaves input field
-	const handleOnBlur = () => {
+	const handleOnBlur = () => addOrUpdateItem()
+
+	const addOrUpdateItem = () => {
 		const itemValue = inputNode.current.value
 
 		// adding new item
@@ -71,7 +84,30 @@ export const GroceryListItem = props => {
 		// updating preexisting item
 		} else {
 			if( value !== inputNode.current.value ) {
-				console.log( 'update item' )
+				Grocer
+					.updateItem( props.id, itemValue )
+					.then( () => {
+						setMessageData({
+							message: 'Item updated!',
+						})
+
+						const updatedListItems = listItems.map( item => {
+							if( item.id === props.id ) {
+								item.name = itemValue
+							}
+
+							return item
+						})
+
+						setListItems( updatedListItems )
+
+					}).catch( err => {
+						setMessageData({
+							message: err,
+							isError: true,
+							delay: 5000,
+						})
+					})
 			}
 		}
 	}
@@ -112,6 +148,7 @@ export const GroceryListItem = props => {
 					class={style.itemInput}
 					value={value}
 					onBlur={handleOnBlur}
+					onKeyUp={handleOnKeyup}
 				/>
 			</div>
 		</div>

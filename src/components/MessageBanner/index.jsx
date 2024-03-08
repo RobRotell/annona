@@ -9,7 +9,7 @@ export const MessageBanner = props => {
 	const { messageData, setMessageData } = useContext( AppContext )
 	const [ isVisible, setIsVisible ] = useState( false )
 
-	const { message = '', delay = 3000, isError = false } = messageData
+	const { message = '', delay = 5000, isError = false } = messageData
 
 	useEffect( () => {
 		if( '' === message ) {
