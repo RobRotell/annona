@@ -16,20 +16,29 @@ export const GroceryList = () => {
 		setListItems
 	} = useContext( AppContext )
 
+
+	const populateListItems = () => {
+		Grocer
+		.getItems()
+		.then( items => {
+			items = items.map( item => {
+				item.isChecked = false
+				return item
+			})
+			setListItems( items )
+		}).catch( err => {
+			console.log( err )
+		})
+	}
+
+
+	useEffect( () => populateListItems(), [] )
+
+
 	// populate list items when user is auto-signed (on page load) or signs in manually
 	useEffect( () => {
 		if( hasSignedIn ) {
-			Grocer
-				.getItems()
-				.then( items => {
-					items = items.map( item => {
-						item.isChecked = false
-						return item
-					})
-					setListItems( items )
-				}).catch( err => {
-					console.log( err )
-				})
+			populateListItems()
 		}
 	}, [ hasSignedIn ] )
 

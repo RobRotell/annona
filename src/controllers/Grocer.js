@@ -1,4 +1,4 @@
-import { get, set } from 'idb-keyval'
+import { del, get, set } from 'idb-keyval'
 import { API } from './API.js'
 import { Creds } from './Creds.js'
 
@@ -6,7 +6,8 @@ import { Creds } from './Creds.js'
 export class Grocer {
 
 
-	static #idbKey = 'annona_api_grocery_items'
+	static #idbKeyAPIItems = 'annona_api_grocery_items'
+	static #idbKeyLocalItems = 'annona_local_grocery_items'
 
 
 	/**
@@ -17,43 +18,82 @@ export class Grocer {
 	 * @return {Promise<array>}
 	 */
 	static async getItems() {
-
-		// start with items from storage
-		let items = await get( Grocer.#idbKey )
-
-		// if we never saved items before, this will be undefined (so let's make it an array)
-		if( !Array.isArray( items ) ) {
-			items = []
-		}
-
-		// if no Internet connection, then this is as far as we go
-		if( !window.navigator.onLine ) {
-			return items
-		}
-
-		// otherwise, check for creds from API
+		const items = new Map
 		const creds = await Creds.getCreds()
 
-		// if not logged in, stop here
-		if( !creds ) {
-			return items
+		// fetch items that have been saved locally but not yet to the API
+		let localItems = await get( Grocer.#idbKeyLocalItems ) // this will return just an array of item names
+
+		if( Array.isArray( localItems ) && localItems.length ) {
+
+			// if we have network access and user has an account, let's add these to API to sync everything
+			if( window.navigator.onLine && creds ) {
+				const addItemPromises = []
+
+				localItems.forEach( name => {
+					addItemPromises.push( new Promise( ( resolve, reject ) => {
+						API.sendRequest( 'items/add', 'POST', true, {
+							name,
+						}).then( res => {
+							if( res && res.status && 'success' === res.status ) {
+								resolve({
+									id: res.items[0].id,
+									name
+								})
+							} else {
+								reject()
+							}
+						})
+					}) )
+				})
+
+				const results = await Promise.allSettled( addItemPromises )
+
+				// only worry about the added ones
+				results.forEach( result => {
+					if( 'fulfilled' === result.status ) {
+						localItems = localItems.filter( item => item !== result.value.name )
+					}
+				})
+			}
+
+			// todo -- do we need to await?
+			if( !localItems.length ) {
+				await del( Grocer.#idbKeyLocalItems )
+			} else {
+				await set( Grocer.#idbKeyLocalItems, localItems )
+
+				localItems.forEach( name => {
+					items.set( Symbol( name ), name )
+				})
+			}
 		}
 
-		// otherwise, let's fetch items from API
-		const apiRes = await API.sendRequest( 'items/get', 'GET', true )
-		const apiItems = apiRes?.items ?? []
+		// if user is logged in and has network access, fetch items from API
+		if( !window.navigator.onLine ) {
+			const apiItems = await get( Grocer.#idbKeyAPIItems )
 
-		// combine local items and API items, but always favor API items (e.g. names)
-		const itemMap = new Map
+			if( Array.isArray( apiItems ) ) {
+				apiItems.forEach( item => {
+					items.set( item.id, item.name )
+				})
+			}
 
-		items.forEach( item => itemMap.set( item.id, item.name ) )
-		apiItems.forEach( item => itemMap.set( item.id, item.name ) )
+		} else {
+			if( creds ) {
+				const apiRes = await API.sendRequest( 'items/get', 'GET', true )
+				const apiItems = apiRes?.items ?? []
+	
+				apiItems.forEach( item => {
+					items.set( item.id, item.name )
+				})
+	
+				// todo -- do we need to await
+				await set( Grocer.#idbKeyAPIItems, apiItems )
+			}
+		}
 
-		const listItems = Array.from( itemMap, ( [ id, name ] ) => ({ id, name }) )
-
-		// todo -- compare arrays to avoid unneeded saving
-		// make sure storage has the latest information
-		await set( Grocer.#idbKey, listItems )
+		const listItems = Array.from( items, ( [ id, name ] ) => ({ id, name }) )
 
 		return listItems
 	}
@@ -63,37 +103,53 @@ export class Grocer {
 	 * Add grocery item
 	 *
 	 * @param {string} name
-	 * @return {Promise<number>} New item ID, if successful
+	 * @return {Promise<Symbol|number>} Symbol for item (if offline or local), ID if saving to API
 	 */
 	static async addItem( name ) {
-		return new Promise( ( resolve, reject ) => {
-			Creds
-				.getCreds()
-				.then( creds => {
 
-					// don't save if user isn't logged in
-					if( !creds ) {
-						return reject( 'You must be logged in to save items.' )
-					}
+		const creds = await Creds.getCreds()
 
-					API
-						.sendRequest( 'items/add', 'POST', true, {
-							name,
-						}).then( res => {
+		// if not logged in (or if no network), save locally
+		if( !creds || !window.navigator.onLine ) {
+			let localItems = await get( Grocer.#idbKeyLocalItems )
 
-							// if no status prop, something went wrong with API
-							if( !res.status ) {
-								return reject( 'Failed to save item. Please try again.' )
-							} else {
-								if( 'success' === res.status ) {
-									return resolve( res.items[0].id )
-								} else {
-									return reject( res.message )
-								}
-							}
-						})
-				})
-		})
+			if( !Array.isArray( localItems ) ) {
+				localItems = []
+			}
+
+			localItems.push( name )
+
+			await set( Grocer.#idbKeyLocalItems, localItems )
+
+			return Symbol( name )
+
+		// otherwise, save to API
+		} else {
+			const apiRes = await API.sendRequest( 'items/add', 'POST', true, {
+				name,
+			})
+
+			if( !apiRes || !apiRes.status || 'success' !== apiRes.status ) {
+				throw new Error( 'Failed to save item. Please try again.' )
+			}
+
+			const newItemId = apiRes.items[0].id
+
+			let items = await get( Grocer.#idbKeyAPIItems )
+
+			if( !Array.isArray( items ) ) {
+				items = []
+			}
+
+			items.push({
+				id: newItemId,
+				name
+			})
+
+			await set( Grocer.#idbKeyAPIItems, items )
+
+			return apiRes.items[0].id
+		}
 	}
 
 
