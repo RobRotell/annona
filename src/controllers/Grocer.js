@@ -33,7 +33,7 @@ export class Grocer {
 
 		// if user isn't logged in, then this is as far as we go
 		if( !creds ) {
-			localItems.forEach( name => items.set( Symbol( name ), name ) )
+			localItems.forEach( name => items.set( name, name ) )
 
 			return Grocer.#arrayifyItemMap( items )
 		}
@@ -54,7 +54,7 @@ export class Grocer {
 				Stocker.saveLocalItems( localItemsNoDuplicates ) // we DON'T need to wait for this is done
 			}
 
-			localItemsNoDuplicates.forEach( name => items.set( Symbol( name ), name ) )
+			localItemsNoDuplicates.forEach( name => items.set( name, name ) )
 			savedApiItems.forEach( item => items.set( item.id, item.name ) )
 
 			return Grocer.#arrayifyItemMap( items )
@@ -115,7 +115,7 @@ export class Grocer {
 		Stocker.saveAPIItems( remoteAPIItems )
 
 		// all together now
-		notAddedLocalItems.forEach( name => items.set( Symbol( name ), name ) )
+		notAddedLocalItems.forEach( name => items.set( name, name ) )
 		remoteAPIItems.forEach( item => items.set( item.id, item.name ) )
 
 		return Grocer.#arrayifyItemMap( items )
@@ -125,66 +125,59 @@ export class Grocer {
 	/**
 	 * Add grocery item
 	 *
+	 * @todo handle preexisting items being saved
+	 *
 	 * @param {string} name
-	 * @return {Promise<Symbol|number>} Symbol for item (if offline or local), ID if saving to API
+	 * @return {Promise<string|number>} name for item (if offline or local), ID if saving to API
 	 */
 	static async addItem( name ) {
+		const creds = await Creds.getCreds()
 
-		// const creds = await Creds.getCreds()
+		// if user isn't logged in (or no network connection), then this is as far as we go
+		if( !creds || !window.navigator.onLine ) {
+			await Stocker.saveSingleLocalItem( name )
 
-		// // if not logged in (or if no network), save locally
-		// if( !creds || !window.navigator.onLine ) {
-		// 	let localItems = await get( Grocer.#idbKeyLocalItems )
+			return name
+		}
 
-		// 	if( !Array.isArray( localItems ) ) {
-		// 		localItems = []
-		// 	}
+		/**
+		 * At this point, we can safely assume:
+		 * 	- user is logged in
+		 * 	- user has network access
+		 *
+		 */
+		const apiRes = await API.sendRequest( 'items/add', 'POST', true, {
+			name
+		})
 
-		// 	localItems.push( name )
+		// did saving to API fail? If so, stop here
+		if( !apiRes || !apiRes.status || 'success' !== apiRes.status ) {
+			throw new Error( 'Failed to save item. Please try again.' )
+		}
 
-		// 	await set( Grocer.#idbKeyLocalItems, localItems )
+		const newItemId = apiRes.items[0].id
 
-		// 	return Symbol( name )
+		// save API item to storage (we DON'T need to wait on this)
+		Stocker.saveSingleAPIItem({
+			id: newItemId,
+			name,
+		})
 
-		// // otherwise, save to API
-		// } else {
-		// 	const apiRes = await API.sendRequest( 'items/add', 'POST', true, {
-		// 		name,
-		// 	})
-
-		// 	if( !apiRes || !apiRes.status || 'success' !== apiRes.status ) {
-		// 		throw new Error( 'Failed to save item. Please try again.' )
-		// 	}
-
-		// 	const newItemId = apiRes.items[0].id
-
-		// 	let items = await get( Grocer.#idbKeyAPIItems )
-
-		// 	if( !Array.isArray( items ) ) {
-		// 		items = []
-		// 	}
-
-		// 	items.push({
-		// 		id: newItemId,
-		// 		name
-		// 	})
-
-		// 	await set( Grocer.#idbKeyAPIItems, items )
-
-		// 	return apiRes.items[0].id
-		// }
+		return newItemId
 	}
 
 
 	/**
 	 * Update grocery item
 	 *
-	 * @param {number} id
+	 * @param {string|number} id string if local item, otherwise, number
 	 * @param {string} name
 	 *
 	 * @return {Promise<boolean>} True, if successful
 	 */
-	static updateItem( id, name ) {
+	static async updateItem( id, name ) {
+		const creds = await Creds.getCreds()
+
 		return new Promise( ( resolve, reject ) => {
 			Creds
 				.getCreds()

@@ -9,7 +9,13 @@ export const MessageBanner = props => {
 	const { messageData, setMessageData } = useContext( AppContext )
 	const [ isVisible, setIsVisible ] = useState( false )
 
-	const { message = '', delay = 5000, isError = false } = messageData
+	let { message = '' } = messageData
+	const { delay = 5000, isError = false } = messageData
+
+	// support for actual error objects
+	if( 'string' !== typeof message && message.message ) {
+		message = message.message
+	}
 
 	useEffect( () => {
 		if( '' === message ) {

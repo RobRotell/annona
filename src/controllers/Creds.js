@@ -11,6 +11,8 @@ export class Creds {
 	/**
 	 * Get creds
 	 *
+	 * @todo validate creds before returning
+	 *
 	 * @return {Promise<object>} { username, password }
 	 */
 	static async getCreds() {
