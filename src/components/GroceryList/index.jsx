@@ -16,28 +16,29 @@ export const GroceryList = () => {
 		setListItems
 	} = useContext( AppContext )
 
+	// avoid fetching twice (once when My Account automatically tries to sign in and once on initial fetch)
+	const [ completedInitialFetch, setCompletedInitialFetch ] = useState( false )
 
 	const populateListItems = () => {
-		Grocer
-		.getItems()
-		.then( items => {
-			items = items.map( item => {
-				item.isChecked = false
-				return item
+		Grocer.getItems()
+			.then( items => {
+				items = items.map( item => {
+					item.isChecked = false
+					return item
+				})
+				setListItems( items )
+			}).catch( err => {
+				console.log( err )
+			}).finally( () => {
+				setCompletedInitialFetch( true )
 			})
-			setListItems( items )
-		}).catch( err => {
-			console.log( err )
-		})
 	}
-
 
 	useEffect( () => populateListItems(), [] )
 
-
-	// populate list items when user is auto-signed (on page load) or signs in manually
+	// populate user if they manually sign in AFTER automatic sign-in on page load
 	useEffect( () => {
-		if( hasSignedIn ) {
+		if( completedInitialFetch && hasSignedIn ) {
 			populateListItems()
 		}
 	}, [ hasSignedIn ] )

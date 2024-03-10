@@ -13,6 +13,7 @@ export const MyAccountPanel = props => {
 		myAccountIsVisible,
 		setMyAccountIsVisible,
 		setMessageData,
+		hasSignedIn,
 		setHasSignedIn,
 	} = useContext( AppContext )
 
@@ -21,20 +22,27 @@ export const MyAccountPanel = props => {
 
 	// pull creds from IndexedDB (if they exist)
 	useEffect( () => {
-		Creds.getCreds()
-			.then( creds => {
-				// todo -- check if creds are valid?
-				if( creds ) {
-					const { username, password } = creds
+		const maybeSetCreds = async () => {
+			const creds = await Creds.getCreds()
 
-					if( username && username.length && password && password.length ) {
-						setUsernameInput( username )
-						setPasswordInput( password )
+			if( !creds ) {
+				return
+			}
 
-						setHasSignedIn( true )
-					}
-				}
-			})
+			const { username = '', password = '' } = creds
+
+			const validated = await Creds.validateCreds( username, password )
+
+			if( validated ) {
+				setUsernameInput( username )
+				setPasswordInput( password )
+
+				setHasSignedIn( true )
+			}
+		}
+
+		maybeSetCreds()
+
 	}, [] )
 
 	const refUsername = createRef()
@@ -46,9 +54,9 @@ export const MyAccountPanel = props => {
 		const username = refUsername.current.value
 		const password = refPassword.current.value
 
-		const isValid = await Creds.validateCreds( username, password )
+		const validated = await Creds.validateCreds( username, password )
 
-		if( !isValid ) {
+		if( !validated ) {
 			setMessageData({
 				message: 'Login failed. Please try again!',
 				isError: true,
