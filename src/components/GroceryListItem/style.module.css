@@ -85,11 +85,11 @@
 			outline: none;
 		}
 
-		&:hover .listItem,
+		/* &:hover .listItem,
 		&:focus .listItem,
 		&:active .listItem {
 			padding-left: 10px;
-		}
+		} */
 	}
 
 	.listItemBlank {

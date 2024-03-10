@@ -47,9 +47,9 @@ export const App = () => {
 				<GroceryList />
 			</main>
 
+			<MessageBanner />
 			<ActionsBar />
 			<MyAccountPanel />
-			<MessageBanner />
 		</AppContext.Provider>
 	)
 }
