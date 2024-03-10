@@ -61,6 +61,56 @@ export class Stocker {
 
 
 	/**
+	 * Update local item
+	 *
+	 * @todo error handling if item wasn't updated
+	 *
+	 * @param {string} originalName
+	 * @param {string} newName
+	 *
+	 * @return {Promise<boolean>} true, if successfully updated
+	 */
+	static async updateLocalItem( originalName, newName ) {
+		if( newName === originalName ) {
+			return true
+		}
+
+		const items = await Stocker.getSavedLocalItems()
+		const itemIndex = items.findIndex( item => item === originalName )
+
+		if( itemIndex ) {
+			items[ itemIndex ] = newName
+		} else {
+			items.push( newName )
+		}
+
+		await Stocker.saveLocalItems( items )
+
+		return true
+	}
+
+
+	/**
+	 * Delete single local item from storage
+	 *
+	 * @return {Promise<boolean>} always true
+	 */
+	static async deleteLocalItem( name ) {
+		let items = await Stocker.getSavedLocalItems()
+
+		console.log( name )
+
+		items = items.filter( item => name !== item )
+
+		console.log( items )
+
+		await Stocker.saveLocalItems( items )
+
+		return true
+	}
+
+
+	/**
 	 * Delete local items from storage
 	 *
 	 * Note that we're not using idb-keyval del() here. We want to keep the value, but just empty it
@@ -123,6 +173,49 @@ export class Stocker {
 	 */
 	static async saveAPIItems( items ) {
 		await set( Stocker.#idbKeyAPIItems, items )
+
+		return true
+	}
+
+
+	/**
+	 * Update API item
+	 *
+	 * @todo error handling if item wasn't updated
+	 *
+	 * @param {number} id
+	 * @param {string} name
+	 *
+	 * @return {Promise<boolean>} true, if successfully updated
+	 */
+	static async updateAPIItem( id, name ) {
+		const items = await Stocker.getSavedAPIItems()
+
+		// switch
+		for( const item of items ) {
+			if( id === item.id ) {
+				item.name = name
+				break
+			}
+		}
+
+		await Stocker.saveAPIItems( items )
+
+		return true
+	}
+
+
+	/**
+	 * Delete single API item from storage
+	 *
+	 * @return {Promise<boolean>} always true
+	 */
+	static async deleteAPIItem( name ) {
+		let items = await Stocker.getSavedAPIItems()
+
+		items = items.filter( item => name !== item )
+
+		await Stocker.saveAPIItems( items )
 
 		return true
 	}

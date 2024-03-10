@@ -13,7 +13,6 @@ export const ActionsBar = () => {
 		setMyAccountIsVisible,
 		listItems,
 		setListItems,
-		messageData,
 		setMessageData,
 	} = useContext( AppContext )
 
@@ -22,52 +21,37 @@ export const ActionsBar = () => {
 
 	// delete currently checked list items
 	// todo -- move to separate file for clarity?
-	const handleTrashClick = () => {
-		const deleteItemPromises = []
+	const handleTrashClick = async () => {
+		const actuallyDeletedItemIds = []
+		const failedToDeleteItemNames = []
 
-		// loop through each item and individually send request to delete item (in future, we'll update API to support
-		// deleting multiple items in one request)
-		listItems.forEach( item => {
+		for( const item of listItems ) {
 			const { id, name, isChecked } = item
 
 			if( isChecked ) {
-				deleteItemPromises.push(
-					new Promise( ( resolve, reject ) => {
-						Grocer.deleteItem( id )
-							.then( () => resolve( id ) )
-							.catch( () => reject({ id, name }) )
-					})
-				)
-			}
-		})
+				const deleted = await Grocer.deleteItem( id )
 
-		// once requests are done, update view and show error message if any items failed to delete
-		Promise.allSettled( deleteItemPromises ).then( results => {
-			const actuallyDeletedItemIds = []
-			const failedToDeleteItemNames = []
-
-			results.forEach( result => {
-				if( 'fulfilled' === result.status ) {
-					actuallyDeletedItemIds.push( result.value )
+				if( !deleted ) {
+					failedToDeleteItemNames.push( name )
 				} else {
-					failedToDeleteItemNames.push( result.reason.name )
+					actuallyDeletedItemIds.push( id )
 				}
-			})
-
-			// if items weren't deleted, show error message
-			if( failedToDeleteItemNames.length ) {
-				setMessageData({
-					message: `Failed to delete the following items: ${failedToDeleteItemNames.join( ', ' )}`,
-					isError: true,
-					delay: 5000,
-				})
 			}
+		}
 
-			// refresh view regardless of fail/success actions
-			const refreshedListItems = listItems.filter( item => !actuallyDeletedItemIds.includes( item.id ) )
+		// if items weren't deleted, show error message
+		if( failedToDeleteItemNames.length ) {
+			setMessageData({
+				message: `Failed to delete the following items: ${failedToDeleteItemNames.join( ', ' )}`,
+				isError: true,
+				delay: 5000,
+			})
+		}
 
-			setListItems( refreshedListItems )
-		})
+		// refresh view regardless of fail/success actions
+		const refreshedListItems = listItems.filter( item => !actuallyDeletedItemIds.includes( item.id ) )
+
+		setListItems( refreshedListItems )
 	}
 
 	return (

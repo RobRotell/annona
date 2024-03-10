@@ -127,13 +127,15 @@ export class Grocer {
 	 *
 	 * @todo handle preexisting items being saved
 	 *
+	 * @throws {Error} failed to save item to API
+	 *
 	 * @param {string} name
 	 * @return {Promise<string|number>} name for item (if offline or local), ID if saving to API
 	 */
 	static async addItem( name ) {
 		const creds = await Creds.getCreds()
 
-		// if user isn't logged in (or no network connection), then this is as far as we go
+		// if user isn't logged in (or no network connection), then add local item
 		if( !creds || !window.navigator.onLine ) {
 			await Stocker.saveSingleLocalItem( name )
 
@@ -157,8 +159,8 @@ export class Grocer {
 
 		const newItemId = apiRes.items[0].id
 
-		// save API item to storage (we DON'T need to wait on this)
-		Stocker.saveSingleAPIItem({
+		// save API item to storage
+		await Stocker.saveSingleAPIItem({
 			id: newItemId,
 			name,
 		})
@@ -170,6 +172,12 @@ export class Grocer {
 	/**
 	 * Update grocery item
 	 *
+	 * @todo split this into updating local item versus updating API item
+	 * @todo rework to delete local item and save as API item if Internet connection
+	 *
+	 * @throws {Error} updating API item without network connection
+	 * @throws {Error} failed to update item in API
+	 *
 	 * @param {string|number} id string if local item, otherwise, number
 	 * @param {string} name
 	 *
@@ -177,70 +185,86 @@ export class Grocer {
 	 */
 	static async updateItem( id, name ) {
 		const creds = await Creds.getCreds()
+		const isLocalItem = 'number' !== typeof id
 
-		return new Promise( ( resolve, reject ) => {
-			Creds
-				.getCreds()
-				.then( creds => {
+		// if user isn't logged in (or we're updating a local item), then update local item
+		if( !creds || isLocalItem ) {
+			await Stocker.updateLocalItem( id, name )
 
-					// don't save if user isn't logged in
-					if( !creds ) {
-						return reject( 'You must be logged in to update items.' )
-					}
+			return true
+		}
 
-					API
-						.sendRequest( 'items/update', 'PATCH', true, {
-							id,
-							name,
-						}).then( res => {
+		// if user has no network connection, stop here (admittedly, not best UX)
+		if( !window.navigator.onLine ) {
+			throw new Error( 'Cannot update item without an Internet connection.' )
+		}
 
-							// if no status prop, something went wrong with API
-							if( !res.status ) {
-								return reject( 'Failed to save item. Please try again.' )
-							} else {
-								if( 'success' === res.status ) {
-									return resolve( true )
-								} else {
-									return reject( res.message )
-								}
-							}
-						})
-				})
+		/**
+		 * At this point, we can safely assume:
+		 * 	- user is logged in
+		 * 	- user has network access
+		 *
+		 */
+		const apiRes = await API.sendRequest( 'items/update', 'PATCH', true, {
+			id,
+			name,
 		})
+
+		if( !apiRes || !apiRes.status || 'success' !== apiRes.status ) {
+			throw new Error( 'Failed to update item. Please try again.' )
+		}
+
+		// update storage
+		await Stocker.updateAPIItem( id, name )
+
+		return true
 	}
 
 
 	/**
 	 * Delete grocery item
 	 *
-	 * @todo currently fetching creds twice (once in this method and once in API); see if there's a way to optimize
+	 * @todo split this into updating local item versus updating API item
 	 *
-	 * @param {number} id
+	 * @throws {Error} deleting API item without Internet connection
+	 *
+	 * @param {string|number} id
 	 * @return {Promise<boolean>} True, if successful
 	 */
-	static deleteItem( id ) {
-		return new Promise( ( resolve, reject ) => {
-			Creds
-				.getCreds()
-				.then( creds => {
+	static async deleteItem( id ) {
+		const creds = await Creds.getCreds()
+		const isLocalItem = 'number' !== typeof id
 
-					// if user isn't signed in, just delete locally
-					if( !creds ) {
-						return resolve( true )
-					}
+		// if user isn't logged in (or if it's a local item), then delete local item
+		if( !creds || isLocalItem ) {
+			await Stocker.deleteLocalItem( id )
 
-					API
-						.sendRequest( 'items/delete', 'DELETE', true, {
-							id
-						}).then( res => {
-							if( res.status && 'success' === res.status ) {
-								return resolve( true )
-							} else {
-								return reject( false )
-							}
-						})
-				})
+			return true
+		}
+
+		// if user has no network conneciton, stop here (admittedly, not best UX)
+		if( !window.navigator.onLine ) {
+			throw new Error( 'Cannot delete item without an Internet connection.' )
+		}
+
+		/**
+		 * At this point, we can safely assume:
+		 * 	- user is logged in
+		 * 	- user has network access
+		 *
+		 */
+		const apiRes = await API.sendRequest( 'items/delete', 'DELETE', true, {
+			id
 		})
+
+		if( !apiRes || !apiRes.status || 'success' !== apiRes.status ) {
+			throw new Error( 'Failed to delete item. Please try again.' )
+		}
+
+		// update storage
+		await Stocker.deleteAPIItem( id )
+
+		return true
 	}
 
 }
