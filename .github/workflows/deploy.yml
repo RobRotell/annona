@@ -27,7 +27,8 @@ jobs:
             - name: Delete remote files and upload new files
               uses: appleboy/scp-action@master
               with:
-                host: 167.71.94.115
+                host: |
+                  ${{ secrets.REMOTE_HOST }}
                 username: ${{ secrets.REMOTE_USER }}
                 port: ${{ secrets.REMOTE_PORT }}
                 key: |
