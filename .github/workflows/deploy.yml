@@ -32,6 +32,9 @@ jobs:
                 username: ${{ secrets.REMOTE_USER }}
                 password: ${{ secrets.REMOTE_PASS }}
                 port: ${{ secrets.REMOTE_PORT }}
+                script: |
+                  whoami
+                  ls -al
 
             - name: Delete remote files and upload new files
               uses: appleboy/scp-action@master
