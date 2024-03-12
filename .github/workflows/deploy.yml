@@ -34,3 +34,5 @@ jobs:
                 key: ${{ secrets.SSH_PRIVATE_KEY }}
                 source: "public/*"
                 target: ${{ secrets.REMOTE_DIR_PATH }}
+				rm: true
+				debug: true
