@@ -1,7 +1,7 @@
 <div style="text-align: center;">
 <br />
 <br />
-<img src="https://raw.githubusercontent.com/RobRotell/annona/main/public/favicon.svg" width="100" height="100" />
+<img src="https://raw.githubusercontent.com/RobRotell/annona/main/public/favicon.svg" width="100" height="100" style="display: block; margin: 0 auto;" />
 <br />
 <br />
 </div>
