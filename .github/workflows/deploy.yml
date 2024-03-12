@@ -32,7 +32,5 @@ jobs:
                 username: ${{ vars.REMOTE_USER }}
                 port: ${{ vars.REMOTE_PORT }}
                 key: ${{ secrets.SSH_PRIVATE_KEY }}
-                source: "./public/*"
+                source: "public/*"
                 target: ${{ vars.REMOTE_DIR_PATH }}
-                rm: true # this deletes files on remote before uploading new files
-
