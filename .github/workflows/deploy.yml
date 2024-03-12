@@ -31,7 +31,8 @@ jobs:
                 host: ${{ secrets.REMOTE_HOST }}
                 username: ${{ secrets.REMOTE_USER }}
                 port: ${{ secrets.REMOTE_PORT }}
-                key: ${{ secrets.SSH_PRIVATE_KEY }}
+                # key: ${{ secrets.SSH_PRIVATE_KEY }}
+                password: ${{ secrets.REMOTE_PASS }}
                 source: "public/*"
                 target: ${{ secrets.REMOTE_DIR_PATH }}
                 rm: true
