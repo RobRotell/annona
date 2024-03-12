@@ -1,0 +1,38 @@
+name: Deploy to server
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploys:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v2
+
+            - name: Initiate Node
+              uses: actions/setup-node@v2
+              with:
+                node-version: '18'
+
+            - name: Install npm dependencies
+              uses: npm install
+
+            # build files into "./public" directory
+            - name: Build from vite into "./public" directory
+              run: npm run build
+
+            - name: Delete remote files and upload new files
+              uses: appleboy/scp-action@master
+              with:
+                host: ${{ vars.REMOTE_HOST }}
+                username: ${{ vars.REMOTE_USER }}
+                port: ${{ vars.REMOTE_PORT }}
+                key: ${{ secrets.SSH_PRIVATE_KEY }}
+                source: "./public/*"
+                target: ${{ vars.REMOTE_DIR_PATH }}
+                rm: true # this deletes files on remote before uploading new files
+
