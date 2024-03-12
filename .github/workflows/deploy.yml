@@ -28,7 +28,7 @@ jobs:
             - name: SSH test
               uses: appleboy/ssh-action@v1.0.3
               with:
-                host: ${{ secrets.REMOTE_HOST }}
+                host: 167.71.94.115
                 username: ${{ secrets.REMOTE_USER }}
                 password: ${{ secrets.REMOTE_PASS }}
                 port: ${{ secrets.REMOTE_PORT }}
