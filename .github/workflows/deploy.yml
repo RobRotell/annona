@@ -19,7 +19,7 @@ jobs:
                 node-version: '18'
 
             - name: Install npm dependencies
-              uses: npm install
+              run: npm install
 
             # build files into "./public" directory
             - name: Build from vite into "./public" directory
