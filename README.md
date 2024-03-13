@@ -1,10 +1,8 @@
-<div style="text-align: center;">
+<center><!-- don't judge me, this is how Github recommended center-aligning items -->
+<img src="https://raw.githubusercontent.com/RobRotell/annona/main/public/favicon.svg" width="100" height="100" />
+</center>
 <br />
 <br />
-<img src="https://raw.githubusercontent.com/RobRotell/annona/main/public/favicon.svg" width="100" height="100" style="display: block; margin: 0 auto;" />
-<br />
-<br />
-</div>
 
 # Annona
 Simple progressive web app for creating a grocery list.
