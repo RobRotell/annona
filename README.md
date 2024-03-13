@@ -1,8 +1,4 @@
-<center><!-- don't judge me, this is how Github recommended center-aligning items -->
 <img src="https://raw.githubusercontent.com/RobRotell/annona/main/public/favicon.svg" width="100" height="100" />
-</center>
-<br />
-<br />
 
 # Annona
 Simple progressive web app for creating a grocery list.
