@@ -2,9 +2,10 @@
 	--yPosition: 100%;
 	--textColor: var(--colorBlack);
 	--backgroundColor: var(--colorGreen);
-	position: sticky;
-	bottom: 0;
+	position: fixed;
+	bottom: 86px;
 	display: block;
+	width: 100%;
 	padding: 16px 32px;
 	font-weight: 700;
 	font-size: 24px;
